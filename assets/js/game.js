@@ -38,6 +38,8 @@ function create() {
 
   // Player
   player = this.physics.add.sprite(100, 450, 'dude');
+  player.body.setGravityY(300);
+  this.physics.add.collider(player, platforms);
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
   // Player movements

@@ -1,6 +1,7 @@
 var platforms;
 var player;
 var cursors;
+var stars;
 
 var config = {
   type: Phaser.AUTO,
@@ -37,16 +38,28 @@ function create() {
   platforms.create(50, 250, 'ground');
   platforms.create(750, 220, 'ground');
 
-  // Star
-  this.add.image(400, 300, 'star');
-
   // Player
   player = this.physics.add.sprite(100, 450, 'dude');
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
   this.physics.add.collider(player, platforms);
 
-  // Animations
+  // Stars - Adding 11 stars: bouncing, collide, collecting
+  stars = this.physics.add.group({
+    key: 'star',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 },
+  });
+
+  stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  });
+
+  this.physics.add.collider(stars, platforms);
+
+  this.physics.add.overlap(player, stars, collectStar, null, this);
+
+  // Player animations
   this.anims.create({
     key: 'left',
     frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
@@ -86,4 +99,9 @@ function update() {
   if (cursors.up.isDown && player.body.touching.down) {
     player.setVelocityY(-330);
   }
+}
+
+// Collect star function
+function collectStar(player, star) {
+  star.disableBody(true, true);
 }

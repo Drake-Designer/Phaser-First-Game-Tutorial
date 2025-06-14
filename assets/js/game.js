@@ -6,6 +6,9 @@ var bombs;
 var score = 0;
 var scoreText;
 var gameOver = false;
+var gameOverText;
+var restartText;
+var gameOverBlinkEvent;
 
 var config = {
   type: Phaser.AUTO,
@@ -24,6 +27,7 @@ var config = {
 var game = new Phaser.Game(config);
 
 function preload() {
+  // Load all game assets
   this.load.image('sky', 'assets/images/sky.png');
   this.load.image('ground', 'assets/images/platform.png');
   this.load.image('star', 'assets/images/star.png');
@@ -32,26 +36,26 @@ function preload() {
 }
 
 function create() {
-  // Sky background
+  // Add sky background
   this.add.image(400, 300, 'sky');
 
-  // Static platforms
+  // Create static platforms
   platforms = this.physics.add.staticGroup();
   platforms.create(400, 568, 'ground').setScale(2).refreshBody();
   platforms.create(600, 400, 'ground');
   platforms.create(50, 250, 'ground');
   platforms.create(750, 220, 'ground');
 
-  // Player
+  // Create player
   player = this.physics.add.sprite(100, 450, 'dude');
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
   this.physics.add.collider(player, platforms);
 
-  // Stars - Adding 12 stars: bouncing, collide, collecting
+  // Create stars (collectibles)
   stars = this.physics.add.group({
     key: 'star',
-    repeat: 11, // <-- correzione! ora sono 12 stelle come nel tutorial
+    repeat: 11,
     setXY: { x: 12, y: 0, stepX: 70 },
   });
 
@@ -60,17 +64,14 @@ function create() {
   });
 
   this.physics.add.collider(stars, platforms);
-
   this.physics.add.overlap(player, stars, collectStar, null, this);
 
-  // Bombs
+  // Create bombs (enemies)
   bombs = this.physics.add.group();
-
   this.physics.add.collider(bombs, platforms);
-
   this.physics.add.collider(player, bombs, hitBomb, null, this);
 
-  // Player animations
+  // Create player animations
   this.anims.create({
     key: 'left',
     frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
@@ -91,20 +92,53 @@ function create() {
     repeat: -1,
   });
 
-  // Keyboard controls
+  // Set up keyboard controls
   cursors = this.input.keyboard.createCursorKeys();
+  cursors.enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
-  // Score
-  scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' }); // "Score" maiuscolo come nel tutorial
+  // Add score display
+  scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+
+  // Add GAME OVER text (centered, hidden by default)
+  gameOverText = this.add
+    .text(400, 250, 'GAME OVER', {
+      fontSize: '64px',
+      fontStyle: 'bold',
+      fill: '#000',
+      stroke: '#fff',
+      strokeThickness: 6,
+      align: 'center',
+    })
+    .setOrigin(0.5)
+    .setVisible(false);
+
+  // Add restart prompt text (centered, hidden by default)
+  restartText = this.add
+    .text(400, 340, 'Press Enter to start a new game!', {
+      fontSize: '32px',
+      fill: '#000',
+      align: 'center',
+    })
+    .setOrigin(0.5)
+    .setVisible(false);
 }
 
 function update() {
-  // Blocca i comandi se il gioco è finito
+  // Game Over function
   if (gameOver) {
+    if (Phaser.Input.Keyboard.JustDown(cursors.enter)) {
+      if (gameOverBlinkEvent) {
+        gameOverBlinkEvent.remove();
+        gameOverBlinkEvent = null;
+      }
+      score = 0;
+      this.scene.restart();
+      gameOver = false;
+    }
     return;
   }
 
-  // Player animation
+  // Handle player movement and animation
   if (cursors.left.isDown) {
     player.setVelocityX(-160);
     player.anims.play('left', true);
@@ -121,14 +155,13 @@ function update() {
   }
 }
 
-// Collect star function
+// Function to handle star collection
 function collectStar(player, star) {
   star.disableBody(true, true);
   score += 10;
   scoreText.setText('Score: ' + score);
 
   if (stars.countActive(true) === 0) {
-    // Se non ci sono più stelle attive
     stars.children.iterate(function (child) {
       child.enableBody(true, child.x, 0, true, true);
     });
@@ -142,10 +175,25 @@ function collectStar(player, star) {
   }
 }
 
-// Hit bomb function
+// Function to handle player collision with a bomb
 function hitBomb(player, bomb) {
   this.physics.pause();
   player.setTint(0xff0000);
   player.anims.play('turn');
   gameOver = true;
+
+  // Show GAME OVER and restart texts
+  gameOverText.setVisible(true);
+  restartText.setVisible(true);
+
+  // Make GAME OVER text blink red and black using a timed event
+  var isRed = false;
+  gameOverBlinkEvent = this.time.addEvent({
+    delay: 250, // milliseconds between color changes
+    loop: true,
+    callback: function () {
+      isRed = !isRed;
+      gameOverText.setColor(isRed ? '#ff0000' : '#000000');
+    },
+  });
 }

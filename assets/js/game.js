@@ -100,33 +100,51 @@ function create() {
     repeat: -1,
   });
 
-  // Setup controls based on device
+  // Setup controls
   if (isMobile) {
-    // Touch controls for mobile only
     this.touchDirection = null;
     this.lastTapTime = 0;
+    this.tapCount = 0;
 
     this.input.on(
       'pointerdown',
       (pointer) => {
-        const half = this.sys.game.config.width / 2;
-        if (pointer.x < half) {
-          this.touchDirection = 'left';
-        } else {
-          this.touchDirection = 'right';
+        // 1. GAME OVER? => Restart game & exit
+        if (gameOver) {
+          if (gameOverBlinkEvent) {
+            gameOverBlinkEvent.remove();
+            gameOverBlinkEvent = null;
+          }
+          score = 0;
+          this.scene.restart();
+          gameOver = false;
+          return;
         }
-        this.lastTapTime = pointer.downTime;
+
+        // 2. Movement (left/right)
+        const half = this.sys.game.config.width / 2;
+        this.touchDirection = pointer.x < half ? 'left' : 'right';
+
+        // 3. Double tap for jump
+        const now = pointer.downTime;
+        if (now - this.lastTapTime < 300) {
+          this.tapCount++;
+        } else {
+          this.tapCount = 1;
+        }
+        this.lastTapTime = now;
+
+        if (this.tapCount === 2 && player.body.touching.down) {
+          player.setVelocityY(-330);
+          this.tapCount = 0;
+        }
       },
       this
     );
 
     this.input.on(
       'pointerup',
-      (pointer) => {
-        const tapDuration = pointer.upTime - this.lastTapTime;
-        if (tapDuration < 220 && player.body.touching.down) {
-          player.setVelocityY(-330);
-        }
+      () => {
         this.touchDirection = null;
       },
       this
@@ -200,7 +218,7 @@ function update() {
       player.setVelocityX(0);
       player.anims.play('turn');
     }
-    // Jump is handled in pointerup event
+    // Jump handled in pointerdown/double tap
   } else if (cursors) {
     // Keyboard controls
     if (cursors.left.isDown) {

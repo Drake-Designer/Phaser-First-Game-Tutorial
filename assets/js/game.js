@@ -10,6 +10,9 @@ var gameOverText;
 var restartText;
 var gameOverBlinkEvent;
 
+// Simple mobile check
+var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 var config = {
   type: Phaser.AUTO,
   parent: 'game-container',
@@ -97,9 +100,50 @@ function create() {
     repeat: -1,
   });
 
-  // Set up keyboard controls
-  cursors = this.input.keyboard.createCursorKeys();
-  cursors.enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+  // Setup controls based on device
+  if (isMobile) {
+    // Touch controls for mobile only
+    this.touchDirection = null;
+    this.lastTapTime = 0;
+
+    this.input.on(
+      'pointerdown',
+      (pointer) => {
+        const half = this.sys.game.config.width / 2;
+        if (pointer.x < half) {
+          this.touchDirection = 'left';
+        } else {
+          this.touchDirection = 'right';
+        }
+        this.lastTapTime = pointer.downTime;
+      },
+      this
+    );
+
+    this.input.on(
+      'pointerup',
+      (pointer) => {
+        const tapDuration = pointer.upTime - this.lastTapTime;
+        if (tapDuration < 220 && player.body.touching.down) {
+          player.setVelocityY(-330);
+        }
+        this.touchDirection = null;
+      },
+      this
+    );
+
+    this.input.on(
+      'pointerout',
+      () => {
+        this.touchDirection = null;
+      },
+      this
+    );
+  } else {
+    // Keyboard controls for desktop only
+    cursors = this.input.keyboard.createCursorKeys();
+    cursors.enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+  }
 
   // Add score display
   scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
@@ -129,9 +173,9 @@ function create() {
 }
 
 function update() {
-  // Game Over function
+  // --- GAME OVER logic ---
   if (gameOver) {
-    if (Phaser.Input.Keyboard.JustDown(cursors.enter)) {
+    if (!isMobile && cursors && Phaser.Input.Keyboard.JustDown(cursors.enter)) {
       if (gameOverBlinkEvent) {
         gameOverBlinkEvent.remove();
         gameOverBlinkEvent = null;
@@ -143,20 +187,35 @@ function update() {
     return;
   }
 
-  // Handle player movement and animation
-  if (cursors.left.isDown) {
-    player.setVelocityX(-160);
-    player.anims.play('left', true);
-  } else if (cursors.right.isDown) {
-    player.setVelocityX(160);
-    player.anims.play('right', true);
-  } else {
-    player.setVelocityX(0);
-    player.anims.play('turn');
-  }
-
-  if (cursors.up.isDown && player.body.touching.down) {
-    player.setVelocityY(-330);
+  // --- Controls logic ---
+  if (isMobile) {
+    // Touch controls
+    if (this.touchDirection === 'left') {
+      player.setVelocityX(-160);
+      player.anims.play('left', true);
+    } else if (this.touchDirection === 'right') {
+      player.setVelocityX(160);
+      player.anims.play('right', true);
+    } else {
+      player.setVelocityX(0);
+      player.anims.play('turn');
+    }
+    // Jump is handled in pointerup event
+  } else if (cursors) {
+    // Keyboard controls
+    if (cursors.left.isDown) {
+      player.setVelocityX(-160);
+      player.anims.play('left', true);
+    } else if (cursors.right.isDown) {
+      player.setVelocityX(160);
+      player.anims.play('right', true);
+    } else {
+      player.setVelocityX(0);
+      player.anims.play('turn');
+    }
+    if (cursors.up.isDown && player.body.touching.down) {
+      player.setVelocityY(-330);
+    }
   }
 }
 

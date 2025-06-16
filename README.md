@@ -47,6 +47,5 @@ This repository is split into two main parts:
 - Spawning collectibles and enemies
 - Managing score and game state
 - Making a game responsive and visually appealing
-- Basic Git & GitHub workflow
 
 ---

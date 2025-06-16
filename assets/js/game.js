@@ -4,7 +4,9 @@ var cursors;
 var stars;
 var bombs;
 var score = 0;
+var highScore = 0;
 var scoreText;
+var highScoreText;
 var gameOver = false;
 var gameOverText;
 var restartText;
@@ -109,7 +111,7 @@ function create() {
     this.input.on(
       'pointerdown',
       (pointer) => {
-        // 1. GAME OVER? => Restart game & exit
+        // GAME OVER? => Restart game & exit
         if (gameOver) {
           if (gameOverBlinkEvent) {
             gameOverBlinkEvent.remove();
@@ -121,11 +123,11 @@ function create() {
           return;
         }
 
-        // 2. Movement (left/right)
+        // Movement (left/right)
         const half = this.sys.game.config.width / 2;
         this.touchDirection = pointer.x < half ? 'left' : 'right';
 
-        // 3. Double tap for jump
+        // Double tap for jump
         const now = pointer.downTime;
         if (now - this.lastTapTime < 300) {
           this.tapCount++;
@@ -165,6 +167,9 @@ function create() {
 
   // Add score display
   scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+
+  // Add high-score display
+  highScoreText = this.add.text(480, 16, 'High-Score:' + highScore, { fontSize: '32px', fill: '#000' });
 
   // Add GAME OVER text (centered, hidden by default)
   gameOverText = this.add
@@ -242,6 +247,11 @@ function collectStar(player, star) {
   star.disableBody(true, true);
   score += 10;
   scoreText.setText('Score: ' + score);
+
+  if (score > highScore) {
+    highScore = score;
+    highScoreText.setText('High-Score:' + highScore);
+  }
 
   if (stars.countActive(true) === 0) {
     stars.children.iterate(function (child) {

@@ -1,3 +1,10 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 /* -----------------------------------> Root Typography + Colour Palette */
 
 :root {
@@ -17,6 +24,7 @@
 /* -----------------------------------> Global settings */
 
 html {
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -74,7 +82,11 @@ html {
 /* -----------------------------------> Game Area Container */
 
 .main-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
   justify-content: center;
 }
 
@@ -84,6 +96,7 @@ html {
   max-height: 900px;
   border: 6px solid var(--color-main-text);
   border-radius: 18px;
+  -webkit-box-shadow: 0 6px 32px purple;
   box-shadow: 0 6px 32px purple;
   background: var(--color-game-container);
 }
@@ -104,6 +117,7 @@ canvas {
 #game-controls {
   background: var(--color-game-controls);
   border-radius: 16px;
+  -webkit-box-shadow: 0 4px 16px #1a014255;
   box-shadow: 0 4px 16px #1a014255;
   padding: 24px 16px;
   color: #fff;
@@ -131,6 +145,7 @@ canvas {
   color: #fff;
   margin: 0.1rem;
   border-radius: 16px;
+  -webkit-box-shadow: 0 -2px 18px #0005;
   box-shadow: 0 -2px 18px #0005;
   font-family: var(--font-primary);
 }
@@ -154,6 +169,8 @@ canvas {
   color: var(--color-main-text);
   text-decoration: none;
   font-weight: 700;
+  -webkit-transition: color 0.2s;
+  -o-transition: color 0.2s;
   transition: color 0.2s;
 }
 

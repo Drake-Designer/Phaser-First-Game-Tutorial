@@ -1,3 +1,19 @@
+/* -----------------------------------> Root Typography + Colour Palette */
+
+:root {
+  /* Typography */
+  --font-primary: 'Lato', Arial, sans-serif;
+  --font-secondary: 'VT323', monospace;
+  --font-headings: 'Bungee', cursive;
+  --font-logo: 'Bungee', cursive;
+
+  /* Colour Palette */
+  --color-navbar-footer: #1a0142;
+  --color-game-container: #22223b;
+  --color-game-controls: #2d2342;
+  --color-main-text: #ff35a8;
+}
+
 /* -----------------------------------> Global settings */
 
 html {
@@ -8,12 +24,13 @@ html {
 
 /* -----------------------------------> Navbar */
 #navbar {
-  background: #1a0142;
-  box-shadow: 0 2px 16px #0004;
+  background: var(--color-navbar-footer);
+  margin: 0.1rem;
+  border-radius: 16px;
 }
 
 .navbar-toggler {
-  border-color: #ff35a8 !important;
+  border-color: var(--color-main-text) !important;
 }
 
 .navbar-toggler-icon {
@@ -22,15 +39,15 @@ html {
 
 .navbar-logo,
 .navbar-nav .nav-link {
-  font-family: 'Bungee', cursive;
-  color: #ff35a8 !important;
+  font-family: var(--font-headings);
+  color: var(--color-main-text) !important;
   letter-spacing: 1px;
 }
 
 .navbar-logo:hover,
 .navbar-nav .nav-link:hover {
   color: #fff !important;
-  text-shadow: 1px 1px 0 #ff35a8;
+  text-shadow: 1px 1px 0 var(--color-main-text);
 }
 
 /* -----------------------------------> Header */
@@ -41,16 +58,16 @@ html {
 }
 
 .header h1 {
-  font-family: 'Bungee', cursive;
+  font-family: var(--font-headings);
   font-size: 2.5rem;
   letter-spacing: 2px;
-  color: #1a0142;
-  text-shadow: 2px 2px 0 #fff, 4px 4px 0 #ff35a8;
+  color: var(--color-navbar-footer);
+  text-shadow: 2px 2px 0 #fff, 4px 4px 0 var(--color-main-text);
 }
 
 .header p {
   font-size: 1.1rem;
-  font-family: 'Lato', Arial, sans-serif;
+  font-family: var(--font-primary);
   color: #20282a;
 }
 
@@ -65,10 +82,10 @@ html {
   width: 100%;
   max-width: 1200px;
   max-height: 900px;
-  border: 6px solid #ff35a8;
+  border: 6px solid var(--color-main-text);
   border-radius: 18px;
   box-shadow: 0 6px 32px purple;
-  background: #222;
+  background: var(--color-game-container);
 }
 
 #game-container {
@@ -85,7 +102,7 @@ canvas {
 /* -----------------------------------> Movements explain section */
 
 #game-controls {
-  background: #2d2342;
+  background: var(--color-game-controls);
   border-radius: 16px;
   box-shadow: 0 4px 16px #1a014255;
   padding: 24px 16px;
@@ -94,15 +111,61 @@ canvas {
 }
 
 #game-controls h2 {
-  font-family: 'Bungee', cursive;
-  color: #ff35a8;
+  font-family: var(--font-headings);
+  color: var(--color-main-text);
 }
 
 #game-controls ul {
-  font-family: 'Lato', Arial, sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.1rem;
 }
 
 #game-controls li {
   margin-bottom: 6px;
+}
+
+/* -----------------------------------> Footer */
+
+#main-footer {
+  background: var(--color-navbar-footer);
+  color: #fff;
+  margin: 0.1rem;
+  border-radius: 16px;
+  box-shadow: 0 -2px 18px #0005;
+  font-family: var(--font-primary);
+}
+
+.footer-logo .footer-brand {
+  font-family: var(--font-logo);
+  font-size: 2rem;
+  color: var(--color-main-text);
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 #fff, 2px 2px 0 var(--color-main-text);
+}
+
+.footer-links .list-inline-item:not(:last-child)::after {
+  content: '|';
+  color: var(--color-main-text);
+  margin: 0 8px;
+  opacity: 0.7;
+}
+
+.footer-links a {
+  color: var(--color-main-text);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover,
+.footer-links a:focus {
+  color: #fff;
+  text-shadow: 1px 1px 0 var(--color-main-text);
+}
+
+.footer-copy {
+  margin-top: 10px;
+  color: #fff;
+  font-size: 0.98rem;
+  letter-spacing: 0.5px;
 }
